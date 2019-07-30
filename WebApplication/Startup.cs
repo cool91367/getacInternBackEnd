@@ -7,6 +7,8 @@ using Microsoft.Extensions.Options;
 using WebApplication.Models;
 using WebApplication.Services;
 using SignalRChat.Hubs;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace WebApplication
 {
@@ -41,6 +43,23 @@ namespace WebApplication
                 });
             });
 
+            //UserDb MSSQL Server Connection
+            services.AddDbContext<UserDbContext>(
+                options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")),
+                ServiceLifetime.Scoped);
+            //Configure Identity
+            services
+                .AddIdentity<User, IdentityRole>(
+                    options =>
+                    {
+                        options.Password.RequireDigit = false;
+                        options.Password.RequiredLength = 1;
+                        options.Password.RequireLowercase = false;
+                        options.Password.RequireNonAlphanumeric = false;
+                        options.Password.RequireUppercase = false;
+                    })
+                .AddEntityFrameworkStores<UserDbContext>(); // Tell Identity which EF DbContext to use
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSignalR();
@@ -64,6 +83,8 @@ namespace WebApplication
             app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
 
             app.UseMvc();
 
