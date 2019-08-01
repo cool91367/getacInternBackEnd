@@ -2,8 +2,6 @@ using WebApplication.Models;
 using WebApplication.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Net;
-
 namespace WebApplication.Controllers
 {
     [Route("api/[controller]")]
@@ -19,11 +17,11 @@ namespace WebApplication.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<chat>> Get() =>
+        public ActionResult<List<Chat>> Get() =>
             chatsService.Get();
 
         [HttpGet("{id:length(24)}", Name = "GetChat")]
-        public ActionResult<chat> Get(string id)
+        public ActionResult<Chat> Get(string id)
         {
             var chat = chatsService.Get(id);
 
@@ -36,7 +34,7 @@ namespace WebApplication.Controllers
         }
 
         [HttpPost]
-        public ActionResult<chat> Create(chat chat)
+        public ActionResult<Chat> Create(Chat chat)
         {
             chatsService.Create(chat);
 
@@ -44,19 +42,20 @@ namespace WebApplication.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
-        public IActionResult Update(string id, chat ChatIn)
+        public IActionResult Update(string id, Chat ChatIn)
         {
             var chat = chatsService.Get(id);
+
             if (chat == null)
             {
                 return NotFound();
             }
+
             chatsService.Update(id, ChatIn);
             chat = chatsService.Get(id);
 
             return CreatedAtRoute("GetChat", chat);
         }
-
 
         [HttpDelete("{id:length(24)}")]
         public IActionResult Delete(string id)

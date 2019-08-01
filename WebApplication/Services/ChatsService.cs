@@ -7,32 +7,32 @@ namespace WebApplication.Services
 {
     public class ChatsService
     {
-        private readonly IMongoCollection<chat> chats;  //follow model
+        private readonly IMongoCollection<Chat> chats;
 
         public ChatsService(IChatDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
-            chats = database.GetCollection<chat>(settings.ChatsCollectionName);
+            chats = database.GetCollection<Chat>(settings.ChatsCollectionName);
         }
 
-        public List<chat> Get() =>
+        public List<Chat> Get() =>
             chats.Find(chat => true).ToList();
 
-        public chat Get(string id) =>
-            chats.Find<chat>(chat => chat.Id == id).FirstOrDefault();
+        public Chat Get(string id) =>
+            chats.Find<Chat>(chat => chat.Id == id).FirstOrDefault();
 
-        public string Create(chat chat)
+        public string Create(Chat chat)
         {
             chats.InsertOne(chat);
             string returnMessage = chat.Id.ToString() + " is stored in database";
             return returnMessage;
         }
 
-        public void Update(string id, chat chatIn) =>
+        public void Update(string id, Chat chatIn) =>
             chats.ReplaceOne(chat => chat.Id == id, chatIn);
 
-        public void Remove(chat chatIn) =>
+        public void Remove(Chat chatIn) =>
             chats.DeleteOne(chat => chat.Id == chatIn.Id);
 
         public void Remove(string id) =>
