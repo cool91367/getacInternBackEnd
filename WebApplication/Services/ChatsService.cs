@@ -22,6 +22,20 @@ namespace WebApplication.Services
         public Chat Get(string id) =>
             chats.Find<Chat>(chat => chat.Id == id).FirstOrDefault();
 
+        public Chat GetChatByTopic(string topic)
+        {
+            var chatBase = chats.Find<Chat>(chat => chat.Topic == topic).ToList().First();
+            return chatBase;
+
+        }
+
+        public List<string> GetTopics()
+        {
+            List<string> topics = new List<string>();
+            foreach (Chat chat in Get()) topics.Add(chat.Topic);
+            return topics;
+        }
+
         public string Create(Chat chat)
         {
             chats.InsertOne(chat);

@@ -1,7 +1,7 @@
-using WebApplication.Models;
-using WebApplication.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using WebApplication.Models;
+using WebApplication.Services;
 namespace WebApplication.Controllers
 {
     [Route("api/[controller]")]
@@ -31,6 +31,22 @@ namespace WebApplication.Controllers
             }
 
             return chat;
+        }
+
+        [HttpGet()]
+        [Route("GetChatByTopic/{topic}")]
+        public ActionResult<Chat> GetChatByTopic(string topic)
+        {
+            var chat = chatsService.GetChatByTopic(topic);
+            if (chat == null) return NotFound();
+            return chat;
+        }
+
+        [HttpGet()]
+        [Route("GetAllTopicInDB")]
+        public List<string> GetAllTopicInDB()
+        {
+            return chatsService.GetTopics();
         }
 
         [HttpPost]
