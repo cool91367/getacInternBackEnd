@@ -46,6 +46,20 @@ namespace WebApplication.Services
         public void Update(string id, Chat chatIn) =>
             chats.ReplaceOne(chat => chat.Id == id, chatIn);
 
+        public Chat UpdateByTopic(string topic, Chat incommingChat)
+        {
+            var chatBase = chats.Find<Chat>(chat => chat.Topic.Equals(topic)).ToList().First();
+            if (chatBase == null)
+            {
+                return null;
+            }
+            ChatLine line = incommingChat.Content.First();
+            chatBase.Content.Add(line);
+            chats.ReplaceOne(chat => chat.Topic == incommingChat.Topic, chatBase);
+
+            return chatBase;
+        }
+
         public void Remove(Chat chatIn) =>
             chats.DeleteOne(chat => chat.Id == chatIn.Id);
 

@@ -73,6 +73,16 @@ namespace WebApplication.Controllers
             return CreatedAtRoute("GetChat", chat);
         }
 
+        [HttpPut]
+        [Route("UpdateByTopic/{topic}")]
+        public IActionResult UpdateByTopic(string topic, [FromBody] Chat chat)
+        {
+            if (chat == null) return NotFound();
+            var result = chatsService.UpdateByTopic(topic, chat);
+            if (result != null) return Ok(result);
+            return NotFound(chat);
+        }
+
         [HttpDelete("{id:length(24)}")]
         public IActionResult Delete(string id)
         {
