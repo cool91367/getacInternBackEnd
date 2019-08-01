@@ -7,32 +7,60 @@ namespace WebApplication.Services
 {
     public class ChatsService
     {
-        private readonly IMongoCollection<chat> chats;  //follow model
+        private readonly IMongoCollection<Chat> chats;
 
         public ChatsService(IChatDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
-            chats = database.GetCollection<chat>(settings.ChatsCollectionName);
+            chats = database.GetCollection<Chat>(settings.ChatsCollectionName);
         }
 
-        public List<chat> Get() =>
+        public List<Chat> Get() =>
             chats.Find(chat => true).ToList();
 
-        public chat Get(string id) =>
-            chats.Find<chat>(chat => chat.Id == id).FirstOrDefault();
+        public Chat Get(string id) =>
+            chats.Find<Chat>(chat => chat.Id == id).FirstOrDefault();
 
-        public string Create(chat chat)
+        public Chat GetChatByTopic(string topic)
+        {
+            var chatBase = chats.Find<Chat>(chat => chat.Topic == topic).ToList().First();
+            return chatBase;
+
+        }
+
+        public List<string> GetTopics()
+        {
+            List<string> topics = new List<string>();
+            foreach (Chat chat in Get()) topics.Add(chat.Topic);
+            return topics;
+        }
+
+        public string Create(Chat chat)
         {
             chats.InsertOne(chat);
             string returnMessage = chat.Id.ToString() + " is stored in database";
             return returnMessage;
         }
 
-        public void Update(string id, chat chatIn) =>
+        public void Update(string id, Chat chatIn) =>
             chats.ReplaceOne(chat => chat.Id == id, chatIn);
 
-        public void Remove(chat chatIn) =>
+        public Chat UpdateByTopic(string topic, Chat incommingChat)
+        {
+            var chatBase = chats.Find<Chat>(chat => chat.Topic.Equals(topic)).ToList().First();
+            if (chatBase == null)
+            {
+                return null;
+            }
+            ChatLine line = incommingChat.Content.First();
+            chatBase.Content.Add(line);
+            chats.ReplaceOne(chat => chat.Topic == incommingChat.Topic, chatBase);
+
+            return chatBase;
+        }
+
+        public void Remove(Chat chatIn) =>
             chats.DeleteOne(chat => chat.Id == chatIn.Id);
 
         public void Remove(string id) =>
