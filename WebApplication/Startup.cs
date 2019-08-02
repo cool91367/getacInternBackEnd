@@ -7,7 +7,6 @@ using WebApplication.Models;
 using WebApplication.Services;
 using Microsoft.Extensions.Options;
 
-
 namespace WebApplication
 {
     public class Startup
@@ -30,6 +29,17 @@ namespace WebApplication
 
             services.AddSingleton<ChatsService>();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -46,8 +56,10 @@ namespace WebApplication
                 app.UseHsts();
             }
 
+            app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
+
             app.UseMvc();
         }
     }
