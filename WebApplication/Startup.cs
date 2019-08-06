@@ -33,8 +33,8 @@ namespace WebApplication
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", policy =>
-                {
-                    policy.AllowAnyOrigin()
+                 {
+                    policy.WithOrigins("https://localhost:3001", "http://localhost:3000")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
