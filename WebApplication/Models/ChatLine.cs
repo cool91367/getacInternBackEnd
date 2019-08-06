@@ -3,7 +3,7 @@ namespace WebApplication.Models
 {
     public class ChatLine
     {
-        public ChatLine() {}
+        public ChatLine() { }
 
         public ChatLine(string chatString, string senderId)
         {

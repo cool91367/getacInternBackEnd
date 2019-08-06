@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using WebApplication.Models;
 using WebApplication.Services;
-using Microsoft.Extensions.Options;
+using SignalRChat.Hubs;
 
 namespace WebApplication
 {
@@ -41,6 +42,11 @@ namespace WebApplication
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddSignalR();
+            
+            services.AddSingleton<ChatHub>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +67,11 @@ namespace WebApplication
             app.UseHttpsRedirection();
 
             app.UseMvc();
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ChatHub>("/chathub");
+            });
         }
     }
 }
