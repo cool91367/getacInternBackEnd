@@ -1,5 +1,11 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
+using Confluent.Kafka;
+using WebApplication.Models;
+using WebApplication;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace SignalRChat.Hubs
 {
