@@ -91,7 +91,6 @@ namespace WebApplication.Controllers
                                 chatsService.Get(),
                                 new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }
                             );
-                            Console.WriteLine(allChats);
                             await chatHub.SendMessage(allChats);
 
                         }

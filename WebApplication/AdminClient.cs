@@ -116,7 +116,7 @@ namespace WebApplication.Kafka
         }
         public static List<string> RemoveAdminTopics(List<string> TopicList)
         {
-            string[] Removee = { "__consumer_offsets" };
+            string[] Removee = { "__consumer_offsets", "connecting", "connect-test" };
             foreach (string RemoveeTopic in Removee)
             {
                 if (TopicList.Contains(RemoveeTopic))
