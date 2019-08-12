@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using WebApplication.Kafka;
 using WebApplication.Models;
 using WebApplication.Services;
+using  Newtonsoft.Json.Serialization;
 
 namespace WebApplication.Controllers
 {
@@ -85,7 +86,12 @@ namespace WebApplication.Controllers
                                 topicListFromDB.Add(cr.Topic);
                             }
 
-                            var allChats = JsonConvert.SerializeObject(chatsService.Get());
+                            var allChats = JsonConvert.SerializeObject
+                            (
+                                chatsService.Get(),
+                                new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }
+                            );
+                            Console.WriteLine(allChats);
                             await chatHub.SendMessage(allChats);
 
                         }

@@ -26,7 +26,6 @@ namespace WebApplication.Models
         public string Id { get; set; }
 
         [BsonElement("Topic")]
-        [JsonProperty("Topic")]
         public string Topic { get; set; }
 
         public List<ChatLine> Content { get; set; }
