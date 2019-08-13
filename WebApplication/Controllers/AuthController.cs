@@ -19,6 +19,27 @@ namespace Web.Controllers
             this.signInManager = signInManager;
         }
 
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody]UserViewModel vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("All fields need to be fill");
+            }
+
+            var usr = new User { UserName = vm.Username };
+            var result = await userManager.CreateAsync(usr, vm.Password);
+
+            if (result.Succeeded)
+            {
+                return Ok("Register succesfully");
+            }
+            else
+            {
+                return BadRequest("User already exsits");
+            }
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]UserViewModel vm)
         {
