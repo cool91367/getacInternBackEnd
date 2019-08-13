@@ -1,0 +1,14 @@
+[
+    {
+        "Key": "group.id",
+        "Value": "test-consumer-group"
+    },
+    {
+        "Key": "bootstrap.servers",
+        "Value": "104.214.149.113:9092"
+    },
+    {
+        "Key": "auto.offset.reset",
+        "Value": "earliest"
+    }
+]
