@@ -19,6 +19,7 @@ namespace Web.Controllers
             this.signInManager = signInManager;
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]UserViewModel vm)
         {
@@ -40,6 +41,7 @@ namespace Web.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]UserViewModel vm)
         {
@@ -74,7 +76,7 @@ namespace Web.Controllers
             }
         }
 
-        [Authorize, HttpPost("logout")]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
