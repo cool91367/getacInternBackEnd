@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebApplication.Models;
 using WebApplication.ViewModels;
 
-namespace Web.Controllers
+namespace WebApplication.Controllers
 {
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
