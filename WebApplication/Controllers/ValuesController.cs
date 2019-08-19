@@ -11,6 +11,7 @@ using WebApplication.Kafka;
 using WebApplication.Models;
 using WebApplication.Services;
 using  Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication.Controllers
 {
@@ -29,6 +30,7 @@ namespace WebApplication.Controllers
             this.chatsService = chatsService;
         }
 
+        [AllowAnonymous]
         [HttpGet("KafkaConsumer")]
         public async Task KafkaConsumer()
         {
