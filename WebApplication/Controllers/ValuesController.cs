@@ -12,6 +12,8 @@ using WebApplication.Models;
 using WebApplication.Services;
 using  Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
+using System.IO;
+using System.Text;
 
 namespace WebApplication.Controllers
 {
@@ -37,6 +39,7 @@ namespace WebApplication.Controllers
             List<string> topicListFromDB = chatsService.GetTopics();
             ConsumerConfig config = JsonConvert.DeserializeObject<ConsumerConfig>(System.IO.File.ReadAllText(Constant.ConsumerConfigFilePath));
             var topicListFromServer = AdminClient.RemoveAdminTopics(AdminClient.getMetadata(Constant.BrokerIP));
+            topicListFromServer.Add("connect-test");// image storage
             foreach (string topic in topicListFromServer)
             {
                 if (!topicListFromDB.Contains(topic))
@@ -46,8 +49,9 @@ namespace WebApplication.Controllers
                 }
             }
 
-            using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
+            using (var consumer = new ConsumerBuilder<Ignore, byte[]>(config).Build())
             {
+                int count = 0;
                 consumer.Subscribe(topicListFromServer);
                 CancellationTokenSource cts = new CancellationTokenSource();
                 Console.CancelKeyPress += (_, e) =>
@@ -63,37 +67,53 @@ namespace WebApplication.Controllers
                         try
                         {
                             var cr = consumer.Consume(cts.Token);
-                            var incomming = new Chat();
-                            try
+                            Console.WriteLine(cr.Topic);
+                            // store the image
+                            if (cr.Topic.Equals("connect-test"))
                             {
-                                ChatLine chatPackage = JsonConvert.DeserializeObject<List<ChatLine>>(cr.Value).First();
-                                incomming = new Chat(cr.Topic, chatPackage);
-                            }
-                            catch (Exception)
-                            {
-                                Console.WriteLine("Deserialize failed, check MongoDB if it is delivered from CLI.");
-                                ChatLine chatPackage = new ChatLine(cr.Value, "CLTestUser");
-                                incomming = new Chat(cr.Topic, chatPackage);
-                            }
-
-                            if (topicListFromDB.Contains(cr.Topic))
-                            {
-                                //Add new line to DB
-                                chatsService.UpdateByTopic(cr.Topic, incomming);
+                                Console.WriteLine(cr.Value);
+                                FileStream myFile = System.IO.File.Open(@"/home/notanadmin/FrontEnd_git/WebApplication_FE/wwwroot/B3Image/" + Convert.ToString(count) + ".jpg", FileMode.Create, FileAccess.Write);
+                                BinaryWriter myWriter = new BinaryWriter(myFile);
+                                myWriter.Write(cr.Value);
+                                myWriter.Close();
+                                myFile.Close();
+                                count++;
                             }
                             else
                             {
-                                //create new Topic
-                                chatsService.Create(incomming);
-                                topicListFromDB.Add(cr.Topic);
+                                var incomming = new Chat();
+                                try
+                                {
+                                    ChatLine chatPackage = JsonConvert.DeserializeObject<List<ChatLine>>(Encoding.Default.GetString(cr.Value)).First();
+                                    incomming = new Chat(cr.Topic, chatPackage);
+                                }
+                                catch (Exception)
+                                {
+                                    Console.WriteLine("Deserialize failed, check MongoDB if it is delivered from CLI.");
+                                    ChatLine chatPackage = new ChatLine(Encoding.Default.GetString(cr.Value), "CLTestUser");
+                                    incomming = new Chat(cr.Topic, chatPackage);
+                                }
+
+                                if (topicListFromDB.Contains(cr.Topic))
+                                {
+                                    //Add new line to DB
+                                    chatsService.UpdateByTopic(cr.Topic, incomming);
+                                }
+                                else
+                                {
+                                    //create new Topic
+                                    chatsService.Create(incomming);
+                                    topicListFromDB.Add(cr.Topic);
+                                }
+
+                                var allChats = JsonConvert.SerializeObject
+                                (
+                                    chatsService.Get(),
+                                    new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }
+                                );
+                                await chatHub.SendMessage(allChats);
                             }
 
-                            var allChats = JsonConvert.SerializeObject
-                            (
-                                chatsService.Get(),
-                                new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }
-                            );
-                            await chatHub.SendMessage(allChats);
 
                         }
                         catch (ConsumeException e)
