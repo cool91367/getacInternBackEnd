@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.Models;
 using WebApplication.ViewModels;
+using NLog;
 
-namespace Web.Controllers
+namespace WebApplication.Controllers
 {
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        private readonly ILogger authLogger = LogManager.GetCurrentClassLogger();
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
 
@@ -25,6 +27,7 @@ namespace Web.Controllers
         {
             if (!ModelState.IsValid)
             {
+                authLogger.Info("400| failed| All fields need to be fill");
                 return BadRequest("All fields need to be fill");
             }
 
@@ -33,10 +36,12 @@ namespace Web.Controllers
 
             if (result.Succeeded)
             {
+                authLogger.Info("200| successfully| {vm.Username} register succeessfully", vm.Username);
                 return Ok("Register succesfully");
             }
             else
             {
+                authLogger.Info("400| failed| User {vm.Username} already exsits", vm.Username);
                 return BadRequest("User already exsits");
             }
         }
@@ -47,6 +52,7 @@ namespace Web.Controllers
         {
             if (!ModelState.IsValid)
             {
+                authLogger.Info("400| failed| All fields need to be fill");
                 return BadRequest("All fields need to be fill");
             }
 
@@ -54,6 +60,7 @@ namespace Web.Controllers
 
             if (userExist == null)
             {
+                authLogger.Info("400| failed| Username {vm.Username} doesn't exist", vm.Username);
                 return BadRequest("Username doesn't exist");
             }
             else
@@ -67,10 +74,12 @@ namespace Web.Controllers
 
                 if (result.Succeeded)
                 {
+                    authLogger.Info("200| successfully| {vm.Username} logined", vm.Username);
                     return Ok("Login succesfully");
                 }
                 else
                 {
+                    authLogger.Info("400| failed| {vm.Username} Password is wrong", vm.Username);
                     return BadRequest("Password is wrong");
                 }
             }
@@ -80,6 +89,7 @@ namespace Web.Controllers
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
+            authLogger.Info("200| successfully| {vm.Username}", User.Identity.Name);
             return Ok("Logout succesfully");
         }
 
