@@ -98,8 +98,8 @@ namespace SignalRChat.Hubs
             var verifyResult = await client.VerifyAsync(faces.FirstOrDefault().FaceId, faces2.FirstOrDefault().FaceId);
 
             string message = $"The verification result is：" +
-                $"\n Same person：{verifyResult.IsIdentical} " +
-                $"\n Confidence：{verifyResult.Confidence}";
+                $"<br> Same person：{verifyResult.IsIdentical} " +
+                $"<br> Confidence：{verifyResult.Confidence}";
 
             Console.WriteLine(message);
 
@@ -184,16 +184,16 @@ namespace SignalRChat.Hubs
             var client2 = new FaceServiceClient(subscriptionKey, enpointUrl);
             var verifyResult = await client2.VerifyAsync(new Guid(words1[3]),new Guid(words2[3]));
 
-            string message = $"Two Picture belongs to ：";
+            string message = $"Two Picture belongs to ";
 
             if (verifyResult.IsIdentical)
             {
-                message += "the same person\n";
+                message += "the same person<br>";
                 message +=  $"Confidence：{verifyResult.Confidence}";
             }
             else
             {
-                message += "different person";
+                message += "different person<br>";
                 message += $"Confidence：{verifyResult.Confidence}";
             }
 
@@ -241,7 +241,7 @@ namespace SignalRChat.Hubs
         public async Task SendFaceCompareName(string name)
         {
             //Path dependent
-            string imageFilePath1 = "C:/Users/user/source/repos/temp/WebApplication/B3Image/";
+            string imageFilePath1 = "B3Image/";
 
             imageFilePath1 += name;
 
@@ -257,7 +257,7 @@ namespace SignalRChat.Hubs
 
             double Match = 0;
 
-            string PicFolder = "C:/Users/user/source/repos/temp/WebApplication/ImageDatabase/";
+            string PicFolder = "ImageDatabase/";
 
             string base64string = "";
 
@@ -297,18 +297,19 @@ namespace SignalRChat.Hubs
                     base64string = "";
                     base64string += Convert.ToBase64String(byteData);
                 }
-            }
+            }            
 
-            string message = $"After searching the Database, the most matching picture is " + MostMatchName + "\n";
+
+            string message = $"After searching the Database, the most matching picture is " + MostMatchName.Split('/')[1] + "<br>";
 
             if (Match > 0.5)
             {
-            message += "They are the same person\n";
+            message += "They are the same person <br>";
             message +=  $"Confidence：{Match}\n";
             }
             else
             {
-            message += "They are different person\n";
+            message += "They are different person <br>";
             message += $"Confidence：{Match}\n";
             }
 
@@ -343,16 +344,16 @@ namespace SignalRChat.Hubs
             var client2 = new FaceServiceClient(subscriptionKey, enpointUrl);
             var verifyResult = await client2.VerifyAsync(new Guid(words1[3]),new Guid(words2[3]));
 
-            string message = $"Two Picture belongs to ：";
+            string message = $"Two Picture belongs to ";
 
             if (verifyResult.IsIdentical)
             {
-                message += "the same person\n";
+                message += "the same person<br>";
                 message +=  $"Confidence：{verifyResult.Confidence}";
             }
             else
             {
-                message += "different person";
+                message += "different person<br>";
                 message += $"Confidence：{verifyResult.Confidence}";
             }
 

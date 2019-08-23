@@ -37,11 +37,12 @@ namespace WebApplication.Controllers
         [HttpGet("getPictureName")]
         public ActionResult<List<string>> getPictureName()
         {
-            string PicFolder = "C:/Users/user/source/repos/temp/WebApplication/B3Image/";
+            string PicFolder = "B3Image\\";
             List<string> picturesName = new List<string>();
             foreach (string Picture in Directory.GetFiles(PicFolder))
             {
                 var pictureName = Picture.Replace(PicFolder, "");
+                //var pictureName = Picture.Split("\")[1];
                 picturesName.Add(pictureName);
             }
             return picturesName;
@@ -52,7 +53,7 @@ namespace WebApplication.Controllers
         public ActionResult<List<string>> getPicture(string name)
         {
             //List<string> picturesName = new List<string>();
-            string PicPath = "C:/Users/user/source/repos/temp/WebApplication/B3Image/" + name;
+            string PicPath = "B3Image/" + name;
             FileStream fileStream = new FileStream(PicPath, FileMode.Open, FileAccess.Read);
             BinaryReader binaryReader = new BinaryReader(fileStream);
             byte[] byteData = binaryReader.ReadBytes((int)fileStream.Length);
@@ -68,7 +69,6 @@ namespace WebApplication.Controllers
             List<string> topicListFromDB = chatsService.GetTopics();
             ConsumerConfig config = JsonConvert.DeserializeObject<ConsumerConfig>(System.IO.File.ReadAllText(Constant.ConsumerConfigFilePath));
             var topicListFromServer = AdminClient.RemoveAdminTopics(AdminClient.getMetadata(Constant.BrokerIP));
-            topicListFromServer.Add("connect-test");// image storage
             foreach (string topic in topicListFromServer)
             {
                 if (!topicListFromDB.Contains(topic))
@@ -80,7 +80,7 @@ namespace WebApplication.Controllers
 
             using (var consumer = new ConsumerBuilder<Ignore, byte[]>(config).Build())
             {
-                int count = 0;
+                string fileName = "";
                 consumer.Subscribe(topicListFromServer);
                 CancellationTokenSource cts = new CancellationTokenSource();
                 Console.CancelKeyPress += (_, e) =>
@@ -98,15 +98,22 @@ namespace WebApplication.Controllers
                             var cr = consumer.Consume(cts.Token);
                             Console.WriteLine(cr.Topic);
                             // store the image
-                            if (cr.Topic.Equals("connect-test"))
+                            if (cr.Topic.Equals("FileContent"))
                             {
-                                Console.WriteLine(cr.Value);
-                                FileStream myFile = System.IO.File.Open(@"/home/notanadmin/FrontEnd_git/WebApplication_FE/wwwroot/B3Image/" + Convert.ToString(count) + ".jpg", FileMode.Create, FileAccess.Write);
-                                BinaryWriter myWriter = new BinaryWriter(myFile);
-                                myWriter.Write(cr.Value);
-                                myWriter.Close();
-                                myFile.Close();
-                                count++;
+                                if (fileName != "")
+                                {
+                                    Console.WriteLine(cr.Value);
+                                    FileStream myFile = System.IO.File.Open(@"B3Image/" + fileName, FileMode.Create, FileAccess.Write);
+                                    BinaryWriter myWriter = new BinaryWriter(myFile);
+                                    myWriter.Write(cr.Value);
+                                    myWriter.Close();
+                                    myFile.Close();
+                                    fileName = "";
+                                }
+                            }
+                            else if (cr.Topic.Equals("FileName"))
+                            {
+                                fileName = Encoding.Default.GetString(cr.Value);
                             }
                             else
                             {
