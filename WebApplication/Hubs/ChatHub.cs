@@ -241,7 +241,7 @@ namespace SignalRChat.Hubs
         public async Task SendFaceCompareName(string name)
         {
             //Path dependent
-            string imageFilePath1 = "/Users/schume/Desktop/";
+            string imageFilePath1 = "C:/Users/user/source/repos/temp/WebApplication/B3Image/";
 
             imageFilePath1 += name;
 
@@ -257,7 +257,10 @@ namespace SignalRChat.Hubs
 
             double Match = 0;
 
-            string PicFolder = "/Users/schume/Desktop/Picture";
+            string PicFolder = "C:/Users/user/source/repos/temp/WebApplication/ImageDatabase/";
+
+            string base64string = "";
+
             foreach (string PictureName in Directory.GetFiles(PicFolder))
             {
                 Console.WriteLine(PictureName);
@@ -289,6 +292,10 @@ namespace SignalRChat.Hubs
                     MostMatchName = "";
                     MostMatchName += PictureName;
                     Match = verifyResult.Confidence;
+                    byte[] byteData = null;
+                    byteData = GetImageAsByteArray(PictureName);
+                    base64string = "";
+                    base64string += Convert.ToBase64String(byteData);
                 }
             }
 
@@ -307,7 +314,7 @@ namespace SignalRChat.Hubs
 
             Console.WriteLine(message);
 
-            await Clients.All.SendAsync("ReceiveFaceCompareMessage", message,MostMatchName);
+            await Clients.All.SendAsync("ReceiveFaceCompareMessage", message,MostMatchName , base64string);
         }
         static byte[] GetImageAsByteArray(string imageFilePath)
         {

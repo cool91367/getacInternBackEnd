@@ -32,6 +32,35 @@ namespace WebApplication.Controllers
             this.chatsService = chatsService;
         }
 
+
+        [AllowAnonymous]
+        [HttpGet("getPictureName")]
+        public ActionResult<List<string>> getPictureName()
+        {
+            string PicFolder = "C:/Users/user/source/repos/temp/WebApplication/B3Image/";
+            List<string> picturesName = new List<string>();
+            foreach (string Picture in Directory.GetFiles(PicFolder))
+            {
+                var pictureName = Picture.Replace(PicFolder, "");
+                picturesName.Add(pictureName);
+            }
+            return picturesName;
+        }
+
+        [AllowAnonymous]
+        [HttpGet("getPicture/{name}")]
+        public ActionResult<List<string>> getPicture(string name)
+        {
+            //List<string> picturesName = new List<string>();
+            string PicPath = "C:/Users/user/source/repos/temp/WebApplication/B3Image/" + name;
+            FileStream fileStream = new FileStream(PicPath, FileMode.Open, FileAccess.Read);
+            BinaryReader binaryReader = new BinaryReader(fileStream);
+            byte[] byteData = binaryReader.ReadBytes((int)fileStream.Length);
+            List<string> picturesName = new List<string>();
+            picturesName.Add(Convert.ToBase64String(byteData));
+            return picturesName;
+        }
+
         [AllowAnonymous]
         [HttpGet("KafkaConsumer")]
         public async Task KafkaConsumer()
