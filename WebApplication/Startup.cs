@@ -44,7 +44,7 @@ namespace WebApplication
             {
                 options.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.WithOrigins("https://localhost:3001", "http://localhost:3000" , "https://webapplicationfe20190823052215.azurewebsites.net")
+                    policy.WithOrigins("https://localhost:3001", "http://localhost:3000", "http://webapplicationfe20190823052215.azurewebsites.net", "https://webapplicationfe20190823052215.azurewebsites.net")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
