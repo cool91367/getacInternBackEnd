@@ -22,7 +22,7 @@ namespace WebApplication.Controllers
     public class ValuesController : ControllerBase
     {
         private ChatHub chatHub;
-
+        private string B3Image = "B3Image/";
         private ChatsService chatsService;
 
 
@@ -33,27 +33,25 @@ namespace WebApplication.Controllers
         }
 
 
-        [AllowAnonymous]
         [HttpGet("getPictureName")]
         public ActionResult<List<string>> getPictureName()
         {
+            // only for windows inorder to show pictures' name right
             string PicFolder = "B3Image\\";
             List<string> picturesName = new List<string>();
             foreach (string Picture in Directory.GetFiles(PicFolder))
             {
                 var pictureName = Picture.Replace(PicFolder, "");
-                //var pictureName = Picture.Split("\")[1];
                 picturesName.Add(pictureName);
             }
             return picturesName;
         }
 
-        [AllowAnonymous]
         [HttpGet("getPicture/{name}")]
         public ActionResult<List<string>> getPicture(string name)
         {
             //List<string> picturesName = new List<string>();
-            string PicPath = "B3Image/" + name;
+            string PicPath = B3Image + name;
             FileStream fileStream = new FileStream(PicPath, FileMode.Open, FileAccess.Read);
             BinaryReader binaryReader = new BinaryReader(fileStream);
             byte[] byteData = binaryReader.ReadBytes((int)fileStream.Length);
@@ -103,7 +101,7 @@ namespace WebApplication.Controllers
                                 if (fileName != "")
                                 {
                                     Console.WriteLine(cr.Value);
-                                    FileStream myFile = System.IO.File.Open(@"B3Image/" + fileName, FileMode.Create, FileAccess.Write);
+                                    FileStream myFile = System.IO.File.Open(@B3Image + fileName, FileMode.Create, FileAccess.Write);
                                     BinaryWriter myWriter = new BinaryWriter(myFile);
                                     myWriter.Write(cr.Value);
                                     myWriter.Close();
@@ -167,6 +165,7 @@ namespace WebApplication.Controllers
         }
 
         // GET api/values
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {

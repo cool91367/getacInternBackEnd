@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using WebApplication.Models;
@@ -15,11 +16,11 @@ namespace WebApplication.Controllers
         {
             this.chatsService = chatsService;
         }
-
+       
         [HttpGet]
         public ActionResult<List<Chat>> Get() =>
             chatsService.Get();
-
+       
         [HttpGet("{id:length(24)}", Name = "GetChat")]
         public ActionResult<Chat> Get(string id)
         {
@@ -32,7 +33,7 @@ namespace WebApplication.Controllers
 
             return chat;
         }
-
+     
         [HttpGet()]
         [Route("GetChatByTopic/{topic}")]
         public ActionResult<Chat> GetChatByTopic(string topic)
@@ -41,7 +42,7 @@ namespace WebApplication.Controllers
             if (chat == null) return NotFound();
             return chat;
         }
-
+      
         [HttpGet()]
         [Route("GetAllTopicInDB")]
         public List<string> GetAllTopicInDB()
